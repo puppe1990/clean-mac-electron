@@ -21,6 +21,7 @@ const storageName = document.getElementById("storage-name");
 const storageAvailable = document.getElementById("storage-available");
 const appsSummary = document.getElementById("apps-summary");
 const appsList = document.getElementById("apps-list");
+const selectAllFiles = document.getElementById("select-all-files");
 
 const btnRefresh = document.getElementById("btn-refresh");
 const btnSelectFolder = document.getElementById("btn-select-folder");
@@ -74,6 +75,20 @@ function updateSummary(files) {
 
 function updateStatus(message) {
   statusText.textContent = message;
+}
+
+function updateSelectAllState() {
+  if (!selectAllFiles) {
+    return;
+  }
+  if (!state.filtered.length) {
+    selectAllFiles.checked = false;
+    selectAllFiles.indeterminate = false;
+    return;
+  }
+  const selectedCount = state.filtered.filter((item) => state.selected.has(item.path)).length;
+  selectAllFiles.checked = selectedCount === state.filtered.length;
+  selectAllFiles.indeterminate = selectedCount > 0 && selectedCount < state.filtered.length;
 }
 
 function updateStorage() {
@@ -171,7 +186,16 @@ function renderTable() {
     cell.style.color = "var(--text-muted)";
     row.appendChild(cell);
     fileTable.appendChild(row);
+    if (selectAllFiles) {
+      selectAllFiles.checked = false;
+      selectAllFiles.indeterminate = false;
+      selectAllFiles.disabled = true;
+    }
     return;
+  }
+
+  if (selectAllFiles) {
+    selectAllFiles.disabled = false;
   }
 
   state.filtered.forEach((item) => {
@@ -187,6 +211,7 @@ function renderTable() {
       } else {
         state.selected.delete(item.path);
       }
+      updateSelectAllState();
     });
     selectCell.appendChild(checkbox);
 
@@ -215,6 +240,8 @@ function renderTable() {
     row.append(selectCell, nameCell, sizeCell, dateCell, originCell, alertCell);
     fileTable.appendChild(row);
   });
+
+  updateSelectAllState();
 }
 
 function applyFilters() {
@@ -363,6 +390,17 @@ sortableHeaders.forEach((header) => {
     applyFilters();
   });
 });
+
+if (selectAllFiles) {
+  selectAllFiles.addEventListener("change", () => {
+    if (selectAllFiles.checked) {
+      state.filtered.forEach((item) => state.selected.add(item.path));
+    } else {
+      state.filtered.forEach((item) => state.selected.delete(item.path));
+    }
+    renderTable();
+  });
+}
 
 loadDefaults();
 updateSortHeader();
