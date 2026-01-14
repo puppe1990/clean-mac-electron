@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld("cleanerAPI", {
   scanPath: (target) => ipcRenderer.invoke("scan:path", target),
   openDirectoryDialog: () => ipcRenderer.invoke("dialog:openDirectory"),
   deleteFiles: (items) => ipcRenderer.invoke("files:delete", items),
-  listApps: () => ipcRenderer.invoke("apps:list")
+  listApps: () => ipcRenderer.invoke("apps:list"),
+  uninstallApp: (appInfo) => ipcRenderer.invoke("apps:uninstall", appInfo)
 });

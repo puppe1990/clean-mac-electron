@@ -241,10 +241,20 @@ button.danger {
   font-size: 14px;
 }
 
+.app-item .app-size {
+  color: var(--accent);
+  font-size: 12px;
+}
+
 .app-item span {
   color: var(--text-muted);
   font-size: 12px;
   word-break: break-all;
+}
+
+.app-item button {
+  justify-self: start;
+  padding: 8px 12px;
 }
 
 .apps-empty {

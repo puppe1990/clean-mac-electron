@@ -107,10 +107,30 @@ function renderApps() {
     const name = document.createElement("strong");
     name.textContent = app.name;
 
+    const size = document.createElement("span");
+    size.className = "app-size";
+    size.textContent = app.sizeLabel || "-";
+
     const path = document.createElement("span");
     path.textContent = app.path;
 
-    item.append(name, path);
+    const action = document.createElement("button");
+    action.className = "danger";
+    action.textContent = "Desinstalar";
+    action.addEventListener("click", async () => {
+      action.disabled = true;
+      const result = await window.cleanerAPI.uninstallApp(app);
+      if (result.ok) {
+        state.apps = state.apps.filter((entry) => entry.path !== app.path);
+        renderApps();
+        appsSummary.textContent = `${state.apps.length} apps encontrados no macOS.`;
+      } else {
+        appsSummary.textContent = result.message || "Falha ao remover o app.";
+      }
+      action.disabled = false;
+    });
+
+    item.append(name, size, path, action);
     appsList.appendChild(item);
   });
 }
@@ -313,7 +333,10 @@ btnListApps.addEventListener("click", async () => {
   appsSummary.textContent = "Buscando apps instalados...";
   try {
     const apps = await window.cleanerAPI.listApps();
-    state.apps = apps;
+    state.apps = apps.map((app) => ({
+      ...app,
+      sizeLabel: Number.isFinite(app.size) ? formatBytes(app.size) : "-"
+    }));
     renderApps();
     appsSummary.textContent = `${apps.length} apps encontrados no macOS.`;
   } catch (error) {

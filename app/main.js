@@ -134,6 +134,33 @@ ipcMain.handle("apps:list", async () => {
   return apps;
 });
 
+ipcMain.handle("apps:uninstall", async (_event, appInfo) => {
+  if (!appInfo || typeof appInfo.path !== "string") {
+    return { ok: false, message: "App invalido." };
+  }
+
+  const { response } = await dialog.showMessageBox({
+    type: "warning",
+    buttons: ["Cancelar", "Mover para Lixeira"],
+    defaultId: 1,
+    cancelId: 0,
+    title: "Confirmar desinstalacao",
+    message: `Deseja mover "${appInfo.name || "este app"}" para a Lixeira?`,
+    detail: "A acao e reversivel enquanto o app estiver na Lixeira."
+  });
+
+  if (response !== 1) {
+    return { ok: false, message: "Operacao cancelada." };
+  }
+
+  try {
+    await shell.trashItem(appInfo.path);
+    return { ok: true, message: "App movido para a Lixeira." };
+  } catch (error) {
+    return { ok: false, message: error.message || "Falha ao remover o app." };
+  }
+});
+
 async function getDiskUsage(targetPath) {
   try {
     const stats = await fs.promises.statfs(targetPath);
@@ -156,13 +183,15 @@ async function listApplications() {
     appDirs.map(async (dir) => {
       try {
         const entries = await fs.promises.readdir(dir, { withFileTypes: true });
-        entries.forEach((entry) => {
+        for (const entry of entries) {
           if (!entry.isDirectory() || !entry.name.endsWith(".app")) {
-            return;
+            continue;
           }
+          const appPath = path.join(dir, entry.name);
           const name = entry.name.replace(/\.app$/i, "");
-          collected.push({ name, path: path.join(dir, entry.name) });
-        });
+          const size = await getDirectorySize(appPath);
+          collected.push({ name, path: appPath, size });
+        }
       } catch (_error) {
         return;
       }
@@ -171,4 +200,45 @@ async function listApplications() {
 
   collected.sort((a, b) => a.name.localeCompare(b.name));
   return collected;
+}
+
+async function getDirectorySize(targetPath) {
+  let total = 0;
+  const stack = [targetPath];
+
+  while (stack.length) {
+    const current = stack.pop();
+    let stats;
+    try {
+      stats = await fs.promises.lstat(current);
+    } catch (_error) {
+      continue;
+    }
+
+    if (stats.isSymbolicLink()) {
+      continue;
+    }
+
+    if (stats.isFile()) {
+      total += stats.size;
+      continue;
+    }
+
+    if (!stats.isDirectory()) {
+      continue;
+    }
+
+    let entries;
+    try {
+      entries = await fs.promises.readdir(current);
+    } catch (_error) {
+      continue;
+    }
+
+    for (const entry of entries) {
+      stack.push(path.join(current, entry));
+    }
+  }
+
+  return total;
 }
