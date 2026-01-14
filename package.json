@@ -1,0 +1,17 @@
+{
+  "name": "clean-mac-electron",
+  "version": "0.1.0",
+  "description": "Electron app for macOS data cleaning with safe analysis and deletion.",
+  "main": "app/main.js",
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "start:dev": "electron . --dev",
+    "lint": "echo \"No lint configured\""
+  },
+  "devDependencies": {
+    "electron": "^29.4.0"
+  }
+}

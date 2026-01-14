@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clean Mac</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Clean Mac</p>
+          <h1>Mapa inteligente de dados do macOS</h1>
+          <p class="subhead">
+            Analise detalhada de arquivos, identificacao de itens suspeitos e exclusao segura direto
+            da interface.
+          </p>
+        </div>
+        <div class="header-actions">
+          <button class="ghost" id="btn-refresh">Atualizar analise</button>
+          <button class="primary" id="btn-select-folder">Selecionar pasta</button>
+        </div>
+      </header>
+
+      <section class="overview">
+        <div class="card">
+          <p>Arquivos analisados</p>
+          <h2 id="summary-total">0</h2>
+        </div>
+        <div class="card">
+          <p>Espaco potencial</p>
+          <h2 id="summary-size">0 B</h2>
+        </div>
+        <div class="card">
+          <p>Itens suspeitos</p>
+          <h2 id="summary-suspicious">0</h2>
+        </div>
+        <div class="card highlight">
+          <p>Escopo atual</p>
+          <h2 id="summary-scope">Carregando...</h2>
+        </div>
+      </section>
+
+      <section class="scan-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Alvos de analise rapida</h3>
+            <p>Pastas mais comuns de acumulo de dados no macOS.</p>
+          </div>
+          <div class="target-list" id="target-list"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Filtros</h3>
+            <p>Refine a lista de arquivos antes da exclusao.</p>
+          </div>
+          <div class="filters">
+            <label>
+              <span>Tamanho minimo</span>
+              <select id="filter-size">
+                <option value="0">Sem filtro</option>
+                <option value="50">+50 MB</option>
+                <option value="200">+200 MB</option>
+                <option value="500">+500 MB</option>
+              </select>
+            </label>
+            <label>
+              <span>Itens suspeitos</span>
+              <select id="filter-suspicious">
+                <option value="all">Todos</option>
+                <option value="only">Apenas suspeitos</option>
+              </select>
+            </label>
+            <label>
+              <span>Ordenacao</span>
+              <select id="filter-sort">
+                <option value="size">Maior tamanho</option>
+                <option value="date">Mais recentes</option>
+                <option value="name">Nome</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="table-section">
+        <div class="table-header">
+          <div>
+            <h3>Arquivos encontrados</h3>
+            <p>Selecione os itens a mover para a Lixeira.</p>
+          </div>
+          <div class="table-actions">
+            <button id="btn-clear" class="ghost">Limpar selecao</button>
+            <button id="btn-delete" class="danger">Mover para Lixeira</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th class="sortable" data-sort="name">Arquivo</th>
+                <th class="sortable" data-sort="size">Tamanho</th>
+                <th class="sortable" data-sort="date">Ultima modificacao</th>
+                <th class="sortable" data-sort="origin">Origem</th>
+                <th>Alertas</th>
+              </tr>
+            </thead>
+            <tbody id="file-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="footer-panel" id="status-panel">
+        <p id="status-text">Pronto para iniciar a analise.</p>
+      </section>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
