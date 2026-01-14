@@ -17,6 +17,41 @@ const SUSPICIOUS_RULES = [
     id: "cache",
     label: "Caches e logs",
     match: (item) => /\.(log|cache)$/i.test(item.name) || item.path.includes("/Library/Caches/")
+  },
+  {
+    id: "dev-builds",
+    label: "Builds e dependencies de dev",
+    match: (item) =>
+      item.path.includes("/DerivedData/") ||
+      item.path.includes("/node_modules/") ||
+      item.path.includes("/.gradle/")
+  },
+  {
+    id: "ios-backups",
+    label: "Backups de iOS",
+    match: (item) => item.path.includes("/MobileSync/Backup/")
+  },
+  {
+    id: "brew-cache",
+    label: "Caches do Homebrew",
+    match: (item) => item.path.includes("/Library/Caches/Homebrew/")
+  },
+  {
+    id: "docker",
+    label: "Docker data",
+    match: (item) =>
+      item.path.includes("/Containers/com.docker.docker/Data/vms/") ||
+      item.path.includes("/Containers/com.docker.docker/Data/vms/")
+  },
+  {
+    id: "browser-cache",
+    label: "Caches de navegador",
+    match: (item) =>
+      item.path.includes("/Library/Caches/Google/Chrome/") ||
+      item.path.includes("/Library/Caches/com.apple.Safari/") ||
+      item.path.includes("/Library/Caches/Microsoft Edge/") ||
+      item.path.includes("/Library/Caches/Firefox/") ||
+      item.path.includes("/Library/Caches/BraveSoftware/")
   }
 ];
 

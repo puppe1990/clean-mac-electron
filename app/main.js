@@ -54,7 +54,40 @@ ipcMain.handle("scan:defaults", async () => {
     { id: "downloads", label: "Downloads", path: path.join(home, "Downloads") },
     { id: "desktop", label: "Desktop", path: path.join(home, "Desktop") },
     { id: "documents", label: "Documents", path: path.join(home, "Documents") },
-    { id: "caches", label: "Library/Caches", path: path.join(home, "Library", "Caches") }
+    { id: "caches", label: "Library/Caches", path: path.join(home, "Library", "Caches") },
+    { id: "logs", label: "Library/Logs", path: path.join(home, "Library", "Logs") },
+    {
+      id: "app-support",
+      label: "Library/Application Support",
+      path: path.join(home, "Library", "Application Support")
+    },
+    {
+      id: "ios-backups",
+      label: "iOS Backups",
+      path: path.join(home, "Library", "Application Support", "MobileSync", "Backup")
+    },
+    {
+      id: "xcode-derived",
+      label: "Xcode/DerivedData",
+      path: path.join(home, "Library", "Developer", "Xcode", "DerivedData")
+    },
+    {
+      id: "docker",
+      label: "Docker/VMs",
+      path: path.join(
+        home,
+        "Library",
+        "Containers",
+        "com.docker.docker",
+        "Data",
+        "vms"
+      )
+    },
+    {
+      id: "browser-caches",
+      label: "Browser/Caches",
+      path: path.join(home, "Library", "Caches")
+    }
   ];
 
   const results = await Promise.all(
