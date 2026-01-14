@@ -196,6 +196,11 @@ ipcMain.handle("apps:uninstall", async (_event, appInfo) => {
   }
 });
 
+ipcMain.handle("disk:usage", async (_event, targetPath) => {
+  const resolvedPath = typeof targetPath === "string" && targetPath.length ? targetPath : os.homedir();
+  return getDiskUsage(resolvedPath);
+});
+
 async function getDiskUsage(targetPath) {
   try {
     const stats = await fs.promises.statfs(targetPath);

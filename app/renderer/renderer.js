@@ -4,6 +4,7 @@ const state = {
   filtered: [],
   selected: new Set(),
   currentScope: "-",
+  currentPath: null,
   disk: null,
   apps: [],
   page: 1,
@@ -22,6 +23,7 @@ const statusText = document.getElementById("status-text");
 const globalLoader = document.getElementById("global-loader");
 const storageName = document.getElementById("storage-name");
 const storageAvailable = document.getElementById("storage-available");
+const btnRefreshDisk = document.getElementById("btn-refresh-disk");
 const appsSummary = document.getElementById("apps-summary");
 const appsList = document.getElementById("apps-list");
 const selectAllFiles = document.getElementById("select-all-files");
@@ -373,6 +375,7 @@ async function scanTarget(targetPath, label) {
     state.files = result.files;
     state.selected.clear();
     state.currentScope = label || targetPath;
+    state.currentPath = targetPath;
     state.disk = result.disk || null;
     applyFilters();
     updateStatus(
@@ -395,6 +398,7 @@ async function loadDefaults() {
   renderTargets();
   updateStatus("Selecione um alvo para iniciar a analise.");
   summaryScope.textContent = "Aguardando";
+  state.currentPath = null;
   state.disk = null;
   updateSummary([]);
   setLoading(false);
@@ -449,6 +453,21 @@ btnListApps.addEventListener("click", async () => {
     setLoading(false);
   }
 });
+
+if (btnRefreshDisk) {
+  btnRefreshDisk.addEventListener("click", async () => {
+    setLoading(true);
+    try {
+      const disk = await window.cleanerAPI.getDiskUsage(state.currentPath);
+      state.disk = disk;
+      updateSummary(state.filtered);
+    } catch (error) {
+      updateStatus(`Falha ao atualizar espaco: ${error.message || error}`);
+    } finally {
+      setLoading(false);
+    }
+  });
+}
 
 filterSize.addEventListener("change", applyFilters);
 filterSuspicious.addEventListener("change", applyFilters);
