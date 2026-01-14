@@ -2,6 +2,8 @@
 
 Aplicativo Electron focado em analise segura de arquivos e limpeza de dados no macOS.
 
+![Interface do Clean Mac Electron](app.png)
+
 ## Estrutura
 
 - `app/main.js`: cria a janela, controla IPC e acoes seguras (scan, dialogos, lixeira).
