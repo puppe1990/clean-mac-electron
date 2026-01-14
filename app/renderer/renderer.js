@@ -4,7 +4,8 @@ const state = {
   filtered: [],
   selected: new Set(),
   currentScope: "-",
-  disk: null
+  disk: null,
+  apps: []
 };
 
 const targetList = document.getElementById("target-list");
@@ -18,11 +19,14 @@ const summaryScope = document.getElementById("summary-scope");
 const statusText = document.getElementById("status-text");
 const storageName = document.getElementById("storage-name");
 const storageAvailable = document.getElementById("storage-available");
+const appsSummary = document.getElementById("apps-summary");
+const appsList = document.getElementById("apps-list");
 
 const btnRefresh = document.getElementById("btn-refresh");
 const btnSelectFolder = document.getElementById("btn-select-folder");
 const btnClear = document.getElementById("btn-clear");
 const btnDelete = document.getElementById("btn-delete");
+const btnListApps = document.getElementById("btn-list-apps");
 
 const filterSize = document.getElementById("filter-size");
 const filterSuspicious = document.getElementById("filter-suspicious");
@@ -84,6 +88,31 @@ function updateStorage() {
   const freeLabel = formatBytes(state.disk.free);
   const totalLabel = formatBytes(state.disk.total);
   storageAvailable.textContent = `${freeLabel} disponiveis de ${totalLabel}`;
+}
+
+function renderApps() {
+  appsList.innerHTML = "";
+  if (!state.apps.length) {
+    const empty = document.createElement("p");
+    empty.className = "apps-empty";
+    empty.textContent = "Nenhum app encontrado.";
+    appsList.appendChild(empty);
+    return;
+  }
+
+  state.apps.forEach((app) => {
+    const item = document.createElement("div");
+    item.className = "app-item";
+
+    const name = document.createElement("strong");
+    name.textContent = app.name;
+
+    const path = document.createElement("span");
+    path.textContent = app.path;
+
+    item.append(name, path);
+    appsList.appendChild(item);
+  });
 }
 
 function renderTargets() {
@@ -277,6 +306,18 @@ btnDelete.addEventListener("click", async () => {
     state.files = state.files.filter((item) => !state.selected.has(item.path));
     state.selected.clear();
     applyFilters();
+  }
+});
+
+btnListApps.addEventListener("click", async () => {
+  appsSummary.textContent = "Buscando apps instalados...";
+  try {
+    const apps = await window.cleanerAPI.listApps();
+    state.apps = apps;
+    renderApps();
+    appsSummary.textContent = `${apps.length} apps encontrados no macOS.`;
+  } catch (error) {
+    appsSummary.textContent = `Falha ao listar apps: ${error.message || error}`;
   }
 });
 

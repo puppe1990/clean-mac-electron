@@ -129,6 +129,11 @@ ipcMain.handle("files:delete", async (_event, items) => {
   };
 });
 
+ipcMain.handle("apps:list", async () => {
+  const apps = await listApplications();
+  return apps;
+});
+
 async function getDiskUsage(targetPath) {
   try {
     const stats = await fs.promises.statfs(targetPath);
@@ -141,4 +146,29 @@ async function getDiskUsage(targetPath) {
   } catch (_error) {
     return null;
   }
+}
+
+async function listApplications() {
+  const appDirs = ["/Applications", path.join(os.homedir(), "Applications")];
+  const collected = [];
+
+  await Promise.all(
+    appDirs.map(async (dir) => {
+      try {
+        const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+        entries.forEach((entry) => {
+          if (!entry.isDirectory() || !entry.name.endsWith(".app")) {
+            return;
+          }
+          const name = entry.name.replace(/\.app$/i, "");
+          collected.push({ name, path: path.join(dir, entry.name) });
+        });
+      } catch (_error) {
+        return;
+      }
+    })
+  );
+
+  collected.sort((a, b) => a.name.localeCompare(b.name));
+  return collected;
 }

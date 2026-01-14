@@ -210,6 +210,49 @@ button.danger {
   color: var(--text-muted);
 }
 
+.apps-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.apps-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.apps-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.app-item {
+  background: rgba(10, 15, 18, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.app-item strong {
+  font-size: 14px;
+}
+
+.app-item span {
+  color: var(--text-muted);
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.apps-empty {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 0;
+}
+
 .target-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
