@@ -135,7 +135,9 @@ async function getDiskUsage(targetPath) {
     const total = stats.blocks * stats.bsize;
     const free = stats.bfree * stats.bsize;
     const used = total - free;
-    return { total, used, free };
+    const root = path.parse(targetPath).root;
+    const name = root === "/" ? "Macintosh HD" : root;
+    return { total, used, free, name };
   } catch (_error) {
     return null;
   }

@@ -16,6 +16,8 @@ const summaryUsedSpace = document.getElementById("summary-used-space");
 const summarySuspicious = document.getElementById("summary-suspicious");
 const summaryScope = document.getElementById("summary-scope");
 const statusText = document.getElementById("status-text");
+const storageName = document.getElementById("storage-name");
+const storageAvailable = document.getElementById("storage-available");
 
 const btnRefresh = document.getElementById("btn-refresh");
 const btnSelectFolder = document.getElementById("btn-select-folder");
@@ -63,10 +65,25 @@ function updateSummary(files) {
   summaryUsedSpace.textContent = state.disk ? formatBytes(state.disk.used) : "-";
   summarySuspicious.textContent = files.filter((item) => item.suspicious.length).length;
   summaryScope.textContent = state.currentScope;
+  updateStorage();
 }
 
 function updateStatus(message) {
   statusText.textContent = message;
+}
+
+function updateStorage() {
+  const diskName = state.disk?.name || "Macintosh HD";
+  storageName.textContent = diskName;
+
+  if (!state.disk) {
+    storageAvailable.textContent = "-";
+    return;
+  }
+
+  const freeLabel = formatBytes(state.disk.free);
+  const totalLabel = formatBytes(state.disk.total);
+  storageAvailable.textContent = `${freeLabel} disponiveis de ${totalLabel}`;
 }
 
 function renderTargets() {

@@ -133,6 +133,60 @@ button.danger {
   font-size: 26px;
 }
 
+.storage-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.storage-panel h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.storage-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+  background: rgba(26, 30, 33, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+
+.storage-drive {
+  width: 52px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #c9cdd1 0%, #8f979e 100%);
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(12, 17, 20, 0.4);
+}
+
+.storage-drive::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 12px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(12, 17, 20, 0.35);
+}
+
+.storage-info p {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.storage-info span {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 .scan-grid {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
@@ -313,6 +367,14 @@ tbody tr:hover {
 
   .scan-grid {
     grid-template-columns: 1fr;
+  }
+
+  .storage-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .storage-card button {
+    justify-self: start;
   }
 }
 
