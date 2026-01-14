@@ -23,6 +23,8 @@ const storageAvailable = document.getElementById("storage-available");
 const appsSummary = document.getElementById("apps-summary");
 const appsList = document.getElementById("apps-list");
 const selectAllFiles = document.getElementById("select-all-files");
+const tableTotal = document.getElementById("table-total");
+const tableSelected = document.getElementById("table-selected");
 
 const btnRefresh = document.getElementById("btn-refresh");
 const btnSelectFolder = document.getElementById("btn-select-folder");
@@ -104,6 +106,16 @@ function updateSelectAllState() {
   const selectedCount = state.filtered.filter((item) => state.selected.has(item.path)).length;
   selectAllFiles.checked = selectedCount === state.filtered.length;
   selectAllFiles.indeterminate = selectedCount > 0 && selectedCount < state.filtered.length;
+}
+
+function updateTableMeta() {
+  if (tableTotal) {
+    tableTotal.textContent = `${state.filtered.length} arquivos`;
+  }
+  if (tableSelected) {
+    const selectedCount = state.filtered.filter((item) => state.selected.has(item.path)).length;
+    tableSelected.textContent = `${selectedCount} selecionados`;
+  }
 }
 
 function updateStorage() {
@@ -206,6 +218,7 @@ function renderTable() {
       selectAllFiles.indeterminate = false;
       selectAllFiles.disabled = true;
     }
+    updateTableMeta();
     return;
   }
 
@@ -227,6 +240,7 @@ function renderTable() {
         state.selected.delete(item.path);
       }
       updateSelectAllState();
+      updateTableMeta();
     });
     selectCell.appendChild(checkbox);
 
@@ -257,6 +271,7 @@ function renderTable() {
   });
 
   updateSelectAllState();
+  updateTableMeta();
 }
 
 function applyFilters() {

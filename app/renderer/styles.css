@@ -340,6 +340,19 @@ button.danger {
   color: var(--text-muted);
 }
 
+.table-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+.table-meta span {
+  display: block;
+}
+
 .table-wrapper {
   margin-top: 18px;
   overflow: auto;
@@ -449,6 +462,15 @@ tbody tr:hover {
 
   .storage-card button {
     justify-self: start;
+  }
+
+  .table-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .table-meta {
+    text-align: left;
   }
 }
 
