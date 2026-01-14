@@ -25,6 +25,8 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, "renderer", "index.html"));
 
+  win.maximize();
+
   if (isDev) {
     win.webContents.openDevTools({ mode: "detach" });
   }

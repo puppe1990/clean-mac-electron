@@ -25,6 +25,7 @@ const appsList = document.getElementById("apps-list");
 const selectAllFiles = document.getElementById("select-all-files");
 const tableTotal = document.getElementById("table-total");
 const tableSelected = document.getElementById("table-selected");
+const tableSelectedSize = document.getElementById("table-selected-size");
 
 const btnRefresh = document.getElementById("btn-refresh");
 const btnSelectFolder = document.getElementById("btn-select-folder");
@@ -115,6 +116,12 @@ function updateTableMeta() {
   if (tableSelected) {
     const selectedCount = state.filtered.filter((item) => state.selected.has(item.path)).length;
     tableSelected.textContent = `${selectedCount} selecionados`;
+  }
+  if (tableSelectedSize) {
+    const selectedTotal = state.filtered
+      .filter((item) => state.selected.has(item.path))
+      .reduce((sum, item) => sum + item.size, 0);
+    tableSelectedSize.textContent = formatBytes(selectedTotal);
   }
 }
 
