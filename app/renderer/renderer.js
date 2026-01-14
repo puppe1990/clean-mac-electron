@@ -22,6 +22,7 @@ const btnDelete = document.getElementById("btn-delete");
 const filterSize = document.getElementById("filter-size");
 const filterSuspicious = document.getElementById("filter-suspicious");
 const filterSort = document.getElementById("filter-sort");
+const filterExtension = document.getElementById("filter-extension");
 const sortableHeaders = Array.from(document.querySelectorAll("th.sortable"));
 
 const tableSort = {
@@ -148,10 +149,21 @@ function renderTable() {
 function applyFilters() {
   const minSizeMB = Number(filterSize.value);
   const suspiciousOnly = filterSuspicious.value === "only";
+  const extensionQuery = filterExtension.value.trim().toLowerCase();
 
   let filtered = state.files.filter((item) => item.size / (1024 * 1024) >= minSizeMB);
   if (suspiciousOnly) {
     filtered = filtered.filter((item) => item.suspicious.length);
+  }
+  if (extensionQuery) {
+    const normalized = extensionQuery
+      .split(",")
+      .map((entry) => entry.trim().replace(/^\\./, ""))
+      .filter(Boolean);
+    filtered = filtered.filter((item) => {
+      const ext = item.name.includes(".") ? item.name.split(".").pop().toLowerCase() : "";
+      return normalized.includes(ext);
+    });
   }
 
   const sortKey = tableSort.key || filterSort.value;
@@ -246,6 +258,7 @@ btnDelete.addEventListener("click", async () => {
 filterSize.addEventListener("change", applyFilters);
 filterSuspicious.addEventListener("change", applyFilters);
 filterSort.addEventListener("change", applyFilters);
+filterExtension.addEventListener("input", applyFilters);
 
 sortableHeaders.forEach((header) => {
   header.addEventListener("click", () => {
