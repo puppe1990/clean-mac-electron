@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
 const path = require("path");
 const os = require("os");
+const fs = require("fs");
 const { scanDirectory } = require("./services/scanner");
 const { formatBytes } = require("./utils/format");
 
@@ -69,7 +70,9 @@ ipcMain.handle("scan:path", async (_event, target) => {
     throw new Error("Invalid path.");
   }
 
-  return scanDirectory(target, { depth: 5, maxEntries: 4000 });
+  const scan = await scanDirectory(target, { depth: 5, maxEntries: 4000 });
+  const disk = await getDiskUsage(target);
+  return { ...scan, disk };
 });
 
 ipcMain.handle("dialog:openDirectory", async () => {
@@ -125,3 +128,15 @@ ipcMain.handle("files:delete", async (_event, items) => {
     message: `Arquivos movidos para a Lixeira. Espaco liberado: ${formatBytes(totalBytes)}.`
   };
 });
+
+async function getDiskUsage(targetPath) {
+  try {
+    const stats = await fs.promises.statfs(targetPath);
+    const total = stats.blocks * stats.bsize;
+    const free = stats.bfree * stats.bsize;
+    const used = total - free;
+    return { total, used, free };
+  } catch (_error) {
+    return null;
+  }
+}

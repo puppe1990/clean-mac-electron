@@ -3,13 +3,16 @@ const state = {
   files: [],
   filtered: [],
   selected: new Set(),
-  currentScope: "-"
+  currentScope: "-",
+  disk: null
 };
 
 const targetList = document.getElementById("target-list");
 const fileTable = document.getElementById("file-table");
 const summaryTotal = document.getElementById("summary-total");
 const summarySize = document.getElementById("summary-size");
+const summaryTotalSpace = document.getElementById("summary-total-space");
+const summaryUsedSpace = document.getElementById("summary-used-space");
 const summarySuspicious = document.getElementById("summary-suspicious");
 const summaryScope = document.getElementById("summary-scope");
 const statusText = document.getElementById("status-text");
@@ -56,6 +59,8 @@ function updateSummary(files) {
   const totalSize = files.reduce((sum, item) => sum + item.size, 0);
   summaryTotal.textContent = files.length;
   summarySize.textContent = formatBytes(totalSize);
+  summaryTotalSpace.textContent = state.disk ? formatBytes(state.disk.total) : "-";
+  summaryUsedSpace.textContent = state.disk ? formatBytes(state.disk.used) : "-";
   summarySuspicious.textContent = files.filter((item) => item.suspicious.length).length;
   summaryScope.textContent = state.currentScope;
 }
@@ -204,6 +209,7 @@ async function scanTarget(targetPath, label) {
     state.files = result.files;
     state.selected.clear();
     state.currentScope = label || targetPath;
+    state.disk = result.disk || null;
     applyFilters();
     updateStatus(
       `Analise concluida. ${result.summary.totalFiles} arquivos encontrados em ${result.targetPath}.`
@@ -223,6 +229,8 @@ async function loadDefaults() {
   renderTargets();
   updateStatus("Selecione um alvo para iniciar a analise.");
   summaryScope.textContent = "Aguardando";
+  state.disk = null;
+  updateSummary([]);
 }
 
 btnRefresh.addEventListener("click", () => loadDefaults());
