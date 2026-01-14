@@ -17,6 +17,7 @@ const summaryUsedSpace = document.getElementById("summary-used-space");
 const summarySuspicious = document.getElementById("summary-suspicious");
 const summaryScope = document.getElementById("summary-scope");
 const statusText = document.getElementById("status-text");
+const globalLoader = document.getElementById("global-loader");
 const storageName = document.getElementById("storage-name");
 const storageAvailable = document.getElementById("storage-available");
 const appsSummary = document.getElementById("apps-summary");
@@ -39,6 +40,8 @@ const tableSort = {
   key: "size",
   direction: "desc"
 };
+
+let loadingCount = 0;
 
 function formatBytes(bytes) {
   if (!Number.isFinite(bytes)) {
@@ -75,6 +78,18 @@ function updateSummary(files) {
 
 function updateStatus(message) {
   statusText.textContent = message;
+}
+
+function setLoading(isLoading) {
+  if (!globalLoader) {
+    return;
+  }
+  if (isLoading) {
+    loadingCount += 1;
+  } else {
+    loadingCount = Math.max(0, loadingCount - 1);
+  }
+  globalLoader.classList.toggle("active", loadingCount > 0);
 }
 
 function updateSelectAllState() {
@@ -294,6 +309,7 @@ function updateSortHeader() {
 
 async function scanTarget(targetPath, label) {
   updateStatus("Analisando arquivos... isso pode levar alguns segundos.");
+  setLoading(true);
   btnDelete.disabled = true;
   btnClear.disabled = true;
 
@@ -310,6 +326,7 @@ async function scanTarget(targetPath, label) {
   } catch (error) {
     updateStatus(`Falha na analise: ${error.message || error}`);
   } finally {
+    setLoading(false);
     btnDelete.disabled = false;
     btnClear.disabled = false;
   }
@@ -317,6 +334,7 @@ async function scanTarget(targetPath, label) {
 
 async function loadDefaults() {
   updateStatus("Carregando alvos recomendados...");
+  setLoading(true);
   const targets = await window.cleanerAPI.scanDefaults();
   state.targets = targets;
   renderTargets();
@@ -324,6 +342,7 @@ async function loadDefaults() {
   summaryScope.textContent = "Aguardando";
   state.disk = null;
   updateSummary([]);
+  setLoading(false);
 }
 
 btnRefresh.addEventListener("click", () => loadDefaults());
@@ -347,6 +366,7 @@ btnDelete.addEventListener("click", async () => {
     return;
   }
 
+  setLoading(true);
   const result = await window.cleanerAPI.deleteFiles(selectedItems);
   updateStatus(result.message || "Operacao concluida.");
   if (result.ok) {
@@ -354,10 +374,12 @@ btnDelete.addEventListener("click", async () => {
     state.selected.clear();
     applyFilters();
   }
+  setLoading(false);
 });
 
 btnListApps.addEventListener("click", async () => {
   appsSummary.textContent = "Buscando apps instalados...";
+  setLoading(true);
   try {
     const apps = await window.cleanerAPI.listApps();
     state.apps = apps.map((app) => ({
@@ -368,6 +390,8 @@ btnListApps.addEventListener("click", async () => {
     appsSummary.textContent = `${apps.length} apps encontrados no macOS.`;
   } catch (error) {
     appsSummary.textContent = `Falha ao listar apps: ${error.message || error}`;
+  } finally {
+    setLoading(false);
   }
 });
 
