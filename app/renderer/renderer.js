@@ -5,7 +5,9 @@ const state = {
   selected: new Set(),
   currentScope: "-",
   disk: null,
-  apps: []
+  apps: [],
+  page: 1,
+  pageSize: 50
 };
 
 const targetList = document.getElementById("target-list");
@@ -26,6 +28,9 @@ const selectAllFiles = document.getElementById("select-all-files");
 const tableTotal = document.getElementById("table-total");
 const tableSelected = document.getElementById("table-selected");
 const tableSelectedSize = document.getElementById("table-selected-size");
+const btnPrevPage = document.getElementById("btn-prev-page");
+const btnNextPage = document.getElementById("btn-next-page");
+const pageInfo = document.getElementById("page-info");
 
 const btnRefresh = document.getElementById("btn-refresh");
 const btnSelectFolder = document.getElementById("btn-select-folder");
@@ -125,6 +130,29 @@ function updateTableMeta() {
   }
 }
 
+function updatePaginationControls(totalPages) {
+  if (pageInfo) {
+    pageInfo.textContent = `Pagina ${state.page} de ${totalPages || 1}`;
+  }
+  if (btnPrevPage) {
+    btnPrevPage.disabled = state.page <= 1;
+  }
+  if (btnNextPage) {
+    btnNextPage.disabled = state.page >= totalPages;
+  }
+}
+
+function getPaginatedItems() {
+  const totalPages = Math.max(1, Math.ceil(state.filtered.length / state.pageSize));
+  if (state.page > totalPages) {
+    state.page = totalPages;
+  }
+  const start = (state.page - 1) * state.pageSize;
+  const end = start + state.pageSize;
+  const items = state.filtered.slice(start, end);
+  return { items, totalPages };
+}
+
 function updateStorage() {
   const diskName = state.disk?.name || "Macintosh HD";
   storageName.textContent = diskName;
@@ -212,6 +240,8 @@ function renderTargets() {
 function renderTable() {
   fileTable.innerHTML = "";
 
+  const { items, totalPages } = getPaginatedItems();
+
   if (!state.filtered.length) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
@@ -225,6 +255,7 @@ function renderTable() {
       selectAllFiles.indeterminate = false;
       selectAllFiles.disabled = true;
     }
+    updatePaginationControls(1);
     updateTableMeta();
     return;
   }
@@ -233,7 +264,7 @@ function renderTable() {
     selectAllFiles.disabled = false;
   }
 
-  state.filtered.forEach((item) => {
+  items.forEach((item) => {
     const row = document.createElement("tr");
 
     const selectCell = document.createElement("td");
@@ -279,6 +310,7 @@ function renderTable() {
 
   updateSelectAllState();
   updateTableMeta();
+  updatePaginationControls(totalPages);
 }
 
 function applyFilters() {
@@ -317,6 +349,7 @@ function applyFilters() {
   });
 
   state.filtered = filtered;
+  state.page = 1;
   renderTable();
   updateSummary(filtered);
 }
@@ -445,6 +478,25 @@ if (selectAllFiles) {
       state.filtered.forEach((item) => state.selected.delete(item.path));
     }
     renderTable();
+  });
+}
+
+if (btnPrevPage) {
+  btnPrevPage.addEventListener("click", () => {
+    if (state.page > 1) {
+      state.page -= 1;
+      renderTable();
+    }
+  });
+}
+
+if (btnNextPage) {
+  btnNextPage.addEventListener("click", () => {
+    const totalPages = Math.max(1, Math.ceil(state.filtered.length / state.pageSize));
+    if (state.page < totalPages) {
+      state.page += 1;
+      renderTable();
+    }
   });
 }
 

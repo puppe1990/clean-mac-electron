@@ -359,6 +359,16 @@ button.danger {
   max-height: 360px;
 }
 
+.pagination {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 .table-wrapper table {
   width: 100%;
   border-collapse: collapse;
